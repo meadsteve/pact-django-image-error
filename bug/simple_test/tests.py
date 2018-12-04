@@ -1,5 +1,4 @@
 import atexit
-import os
 import socket
 
 from django.test import TestCase
@@ -24,10 +23,6 @@ def _pact_mock_server():
     return server_address_pair
 
 
-def _image():
-    return open(os.path.dirname(os.path.realpath(__file__)) + '/image.jpg', 'rb')
-
-
 class ReplicationTestCase(TestCase):
 
     def test_image_upload(self):
@@ -36,7 +31,7 @@ class ReplicationTestCase(TestCase):
 
         response = self.client.post(
             django_endpoint,
-            data={'image': _image(), 'pact_endpoint': pact_endpoint}
+            data={'pact_endpoint': pact_endpoint}
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 200, response.content)
