@@ -1,10 +1,9 @@
 import atexit
+import os
 import socket
 
-from django.test import TestCase
-from django.urls import reverse
 from pact import Consumer, Provider
-
+from requests import put
 
 def _pact_mock_server():
 
@@ -23,15 +22,11 @@ def _pact_mock_server():
     return server_address_pair
 
 
-class ReplicationTestCase(TestCase):
+def test_image_upload():
+    pact, pact_endpoint = _pact_mock_server()
 
-    def test_image_upload(self):
-        pact, pact_endpoint = _pact_mock_server()
-        django_endpoint = reverse('index')
+    image = open(os.path.dirname(os.path.realpath(__file__)) + '/image.jpg', 'rb')
 
-        response = self.client.post(
-            django_endpoint,
-            data={'pact_endpoint': pact_endpoint}
-        )
+    result = put(pact_endpoint, data=image)
 
-        self.assertEqual(response.status_code, 200, response.content)
+    assert result.status_code == 200, "Error: %s" % result.json().get("message", "unknown")
