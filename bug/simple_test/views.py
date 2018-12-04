@@ -1,6 +1,22 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from django import forms
+from django.http import HttpResponse, HttpRequest
+from django.views import View
+from requests import put
 
-from django.shortcuts import render
+class PutImageForm(forms.Form):
+    image = forms.ImageField(required=True)
+    pact_endpoint = forms.CharField(required=True)
 
-# Create your views here.
+class PutImageView(View):
+    def post(self, request):
+        form = PutImageForm(request.POST, request.FILES)
+        if not form.is_valid():
+            raise Exception("We're missing some data")
+
+        image = form.cleaned_data.get('image')
+        pact_endpoint = form.cleaned_data.get('pact_endpoint')
+        result = put(pact_endpoint, data=image)
+        if result.status_code == 200:
+            return HttpResponse("Image uploaded")
+
+        raise Exception("Something went wrong pact returned: %s" % result.status_code)

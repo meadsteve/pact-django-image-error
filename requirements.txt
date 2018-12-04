@@ -1,2 +1,4 @@
 Django==1.11.16
 pact-python==0.18.0
+requests==2.20.0
+Pillow==5.3.0
